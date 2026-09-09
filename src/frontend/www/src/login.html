@@ -1,0 +1,71 @@
+<!--
+  华为云版 - 自建登录页
+  部署方式：上传至 OBS 静态网站托管
+  登录成功后生成 JWT 并存入 localStorage，前端 React App 读取 token 调用 API
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Todo App 登录</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
+    .login-card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 360px; }
+    h2 { text-align: center; color: #333; }
+    input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { width: 100%; padding: 12px; background: #007cube; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #0055a3; }
+    .error { color: red; font-size: 14px; text-align: center; margin-top: 8px; }
+    .info { font-size: 12px; color: #666; text-align: center; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <h2>Serverless Todo</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="用户名（邮箱）" required />
+      <input type="password" id="password" placeholder="密码" required />
+      <button type="submit">登录</button>
+    </form>
+    <div class="error" id="errorMsg" style="display:none;"></div>
+    <div class="info">
+      华为云 IAM 认证
+    </div>
+  </div>
+
+  <script>
+    // IAM 基础认证 → 换取 JWT token（示例逻辑，实际需要配合后端 FunctionGraph IAM 认证函数）
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('errorMsg');
+
+      try {
+        // 调用 IAM 认证 API（需配合 JWT 签发函数）
+        const response = await fetch('<APIG_ENDPOINT>/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!response.ok) throw new Error('认证失败，请检查用户名和密码');
+
+        const data = await response.json();
+        const token = data.token; // JWT token
+
+        // 存储 token 并跳转回原应用
+        localStorage.setItem('todo_jwt_token', token);
+
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect_uri')
+          || sessionStorage.getItem('redirect_url')
+          || '/';
+        window.location.href = redirectUrl;
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

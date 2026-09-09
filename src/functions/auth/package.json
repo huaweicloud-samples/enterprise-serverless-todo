@@ -1,0 +1,14 @@
+{
+  "name": "todo-auth",
+  "version": "1.0.0",
+  "description": "Authentication functions - JWT replacement for Cognito",
+  "main": "index.js",
+  "dependencies": {
+    "mongodb": "^4.17.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

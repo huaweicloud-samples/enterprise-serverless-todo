@@ -1,0 +1,12 @@
+{
+  "name": "todo-functions",
+  "version": "1.0.0",
+  "description": "Todo app FunctionGraph functions - Huawei Cloud",
+  "main": "index.js",
+  "dependencies": {
+    "mongodb": "^4.17.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
